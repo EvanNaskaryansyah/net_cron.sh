@@ -60,4 +60,4 @@ echo "Script cleanup_logs.sh berhasil dibuat di /home/pajak/script/"
 echo "Izin eksekusi diberikan dengan chmod +x"
 echo "Crontab berhasil ditambahkan:"
 crontab -l | grep cleanup_logs.sh
-
+/home/pajak/script/cleanup_logs.sh
