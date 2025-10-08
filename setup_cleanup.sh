@@ -1,6 +1,4 @@
 #!/bin/bash
-cat << 'EOF' > setup_cleanup.sh
-#!/bin/bash
 
 # Membuat folder script jika belum ada
 #mkdir -p /home/pajak/script
@@ -65,6 +63,6 @@ crontab -l | grep cleanup_logs.sh
 EOF
 
 # Jalankan setup dan hapus setelah selesai
-sudo /home/pajak/script/cleanup_logs.sh && rm -f setup_cleanup.sh
+sudo /home/pajak/script/cleanup_logs.sh
 echo "Selesai menghapus file di log dan sent."
 
