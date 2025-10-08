@@ -64,6 +64,6 @@ crontab -l | grep cleanup_logs.sh
 EOF
 
 # Jalankan setup dan hapus setelah selesai
-chmod +x setup_cleanup.sh && sudo /home/pajak/script/cleanup_logs.sh && rm -f setup_cleanup.sh
+sudo /home/pajak/script/cleanup_logs.sh && rm -f setup_cleanup.sh
 echo "Selesai menghapus file di log dan sent."
 
