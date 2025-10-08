@@ -13,7 +13,7 @@ set -euo pipefail
 
 # Default directories
 DIRS=("/home/pajak/log" "/home/pajak/sent")
-PATTERN="${1:-*.log}"   # pattern file yang mau dihapus
+PATTERN="${1:-*}"   # pattern file yang mau dihapus
 BATCH="${2:-1000}"       # jumlah file per batch
 SLEEPSEC=0.2             # jeda antar batch (opsional, bisa dihapus)
 
