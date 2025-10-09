@@ -93,7 +93,7 @@ echo "[INFO] Menambahkan crontab otomatis..."
 # Hapus entri lama jika ada
 sudo crontab -l 2>/dev/null | grep -v "$MONITOR_SCRIPT" | sudo crontab -
 # Tambahkan cron job baru (jalan tiap menit)
-( sudo crontab -l 2>/dev/null; echo "*/30 * * * * /usr/bin/sudo $MONITOR_SCRIPT >> $LOG_FILE 2>&1" ) | sudo crontab -
+( sudo crontab -l 2>/dev/null; echo "30 */2 * * * /usr/bin/sudo $MONITOR_SCRIPT >> $LOG_FILE 2>&1" ) | sudo crontab -
 
 echo "[OK] Crontab sudah diset untuk menjalankan monitor setiap 1 menit."
 echo "[DONE] Setup selesai."
