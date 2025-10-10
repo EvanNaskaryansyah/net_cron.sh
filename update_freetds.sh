@@ -1,16 +1,15 @@
 #!/bin/bash
-# update_freetds.sh (versi mawk-compatible)
 set -euo pipefail
 
 CONF='/etc/freetds/freetds.conf'
 
-# Pastikan nmap tersedia
+# pastikan nmap ada
 if ! command -v nmap >/dev/null 2>&1; then
-  echo "nmap tidak ditemukan. Pasang dulu: sudo apt update && sudo apt install -y nmap"
+  echo "nmap tidak ditemukan. Install dulu: sudo apt install -y nmap"
   exit 2
 fi
 
-# Cari IP pertama dengan port 1433 open (tanpa match(), supaya kompatibel mawk)
+# cari IP MSSQL pertama dengan port 1433 terbuka
 NEWIP=$(nmap -p 1433 --open -oG - 192.168.1.* 2>/dev/null \
   | awk '/Ports:/{ if($0 ~ /1433\/open/) { sub(/.*Host: /,""); sub(/ .*/,""); print } }' \
   | head -n1 || true)
@@ -20,42 +19,43 @@ if [ -z "${NEWIP:-}" ]; then
   exit 0
 fi
 
-echo "$(date '+%F %T') - Menemukan IP: $NEWIP — akan mengganti host di $CONF (tanpa backup)"
+echo "$(date '+%F %T') - Menemukan IP: $NEWIP — mengganti host lama di $CONF"
 
-# Update bagian [mssql] di freetds.conf
 awk -v newip="$NEWIP" '
-  BEGIN { in_section=0; host_re="^[[:space:]]*host[[:space:]]*="; host_replaced=0 }
-  /^\[mssql\]/ { print; in_section=1; next }
+  BEGIN { in_mssql=0; done=0 }
+  /^\[mssql\]/ { print; in_mssql=1; next }
   /^\[.*\]/ {
-      if(in_section && host_replaced==0) {
-          print "\thost = " newip
-      }
-      in_section=0
-      print
-      next
+    if (in_mssql && done==0) {
+      print "\thost = " newip
+    }
+    in_mssql=0
+    print
+    next
   }
   {
-    if(in_section) {
-      if ($0 ~ host_re) {
-        sub(/=.*/,"= " newip)
-        host_replaced=1
+    if (in_mssql) {
+      if ($0 ~ /^[[:space:]]*host[[:space:]]*=/) {
+        if (done==0) {
+          sub(/=.*/,"= " newip)
+          print
+          done=1
+        }
+        next  # skip host lama lain
+      } else {
         print
-        next
       }
-      print
       next
-    } else {
-      print
     }
+    print
   }
   END {
-    if(in_section && host_replaced==0) {
+    if (in_mssql && done==0) {
       print "\thost = " newip
     }
   }
 ' "$CONF" > /tmp/update_freetds_conf_$$.tmp
 
-# Tulis hasilnya ke file (langsung atau pakai sudo)
+# tulis ke file
 if mv /tmp/update_freetds_conf_$$.tmp "$CONF" 2>/dev/null; then
   echo "$(date '+%F %T') - Ditulis langsung ke $CONF"
 else
@@ -64,7 +64,7 @@ else
   rm -f /tmp/update_freetds_conf_$$.tmp
 fi
 
-# Set permission
+# set permission
 if [ "$(id -u)" -eq 0 ]; then
   chown root:root "$CONF" || true
   chmod 644 "$CONF" || true
