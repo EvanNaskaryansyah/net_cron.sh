@@ -16,7 +16,7 @@ if not exist "%TARGET%" (
 
 REM Menyalin hanya file .xls dari folder sumber (tanpa subfolder)
 echo Menyalin file .xls dari %SOURCE% ke %TARGET% ...
-xcopy "%SOURCE%\*.xls" "%TARGET%\" /D /Y /I
+xcopy "%SOURCE%\*.xls" "%TARGET%\" /Y /I
 
 echo.
 echo Selesai menyalin file .xls.
